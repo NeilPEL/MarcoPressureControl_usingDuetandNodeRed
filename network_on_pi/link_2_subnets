@@ -1,0 +1,6 @@
+#!/bin/bash
+# Replaces 192.168.50.X with your Pi's main network IP
+sudo nmcli connection modify "Wired connection 1" ipv4.method manual
+sudo nmcli connection modify "Wired connection 1" ipv4.addresses "192.168.50.X/24,192.168.0.250/24"
+sudo nmcli connection reload
+sudo nmcli connection up "Wired connection 1"
