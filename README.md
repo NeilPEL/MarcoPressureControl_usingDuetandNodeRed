@@ -39,6 +39,6 @@ Standard Duet charts are restricted to temperature sensors. To display pressure:
 ---
 
 ## 📂 Source Code
-* **Node-RED Flow:** See `/node-red/flows.json` for the full dashboard and Modbus logic.
+* **Node-RED Flow:** See `nodered/ModBus_MarcoPressureControl.json` for the full dashboard and Modbus logic.
 * **Python Test:** See `/python/pressure_test.py` for hardware debugging.
 * **Networking:** See `/scripts/network_setup.sh` for the IP bridging command.
