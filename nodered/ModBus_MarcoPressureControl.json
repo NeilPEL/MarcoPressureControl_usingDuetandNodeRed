@@ -1,0 +1,386 @@
+[
+    {
+        "id": "read_actual_pressure",
+        "type": "modbus-read",
+        "z": "671c8b8f153cec31",
+        "name": "Read Actual Pressure",
+        "topic": "",
+        "showStatusActivities": true,
+        "logIOActivities": false,
+        "showErrors": true,
+        "showWarnings": true,
+        "unitid": "1",
+        "dataType": "HoldingRegister",
+        "adr": "25",
+        "quantity": "1",
+        "rate": "1",
+        "rateUnit": "s",
+        "delayOnStart": false,
+        "startDelayTime": "",
+        "server": "marco_modbus_client",
+        "useIOFile": false,
+        "ioFile": "",
+        "useIOForPayload": false,
+        "emptyMsgOnFail": false,
+        "x": 160,
+        "y": 2600,
+        "wires": [
+            [
+                "extract_value",
+                "bc6edd12374bc08a"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "extract_value",
+        "type": "function",
+        "z": "671c8b8f153cec31",
+        "name": "Extract Int",
+        "func": "// Get the raw value from the Modbus array\nvar rawValue = msg.payload[0];\n\n// 65535 (0xFFFF) is an error/null state for this controller\nif (rawValue === 65535 || rawValue === undefined) {\n    // Returning null stops the flow here, so the Gauge/Chart \n    // won't flicker or jump to a high number.\n    return null;\n}\n\n// Optional: Filter out massive spikes (e.g., if max pressure is 3000)\nif (rawValue > 5000) {\n    return null;\n}\n\n// Pass the valid value forward\nmsg.payload = rawValue;\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 380,
+        "y": 2600,
+        "wires": [
+            [
+                "pressure_gauge",
+                "pressure_chart"
+            ]
+        ]
+    },
+    {
+        "id": "pressure_gauge",
+        "type": "ui_gauge",
+        "z": "671c8b8f153cec31",
+        "name": "Actual Pressure",
+        "group": "marco_ui_group",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Actual Pressure (mBar)",
+        "label": "mBar",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "3000",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 620,
+        "y": 2560,
+        "wires": []
+    },
+    {
+        "id": "pressure_chart",
+        "type": "ui_chart",
+        "z": "671c8b8f153cec31",
+        "name": "Pressure History",
+        "group": "marco_ui_group",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "label": "Pressure Trend",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "outputs": 1,
+        "className": "",
+        "x": 620,
+        "y": 2640,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "set_target_ui",
+        "type": "ui_numeric",
+        "z": "671c8b8f153cec31",
+        "name": "",
+        "label": "Set Target (mBar)",
+        "tooltip": "",
+        "group": "marco_ui_group",
+        "order": 1,
+        "width": "0",
+        "height": "0",
+        "wrap": false,
+        "passthru": true,
+        "topic": "",
+        "topicType": "str",
+        "format": "",
+        "min": 0,
+        "max": "6000",
+        "step": 10,
+        "className": "",
+        "x": 270,
+        "y": 2460,
+        "wires": [
+            [
+                "write_target_pressure"
+            ]
+        ]
+    },
+    {
+        "id": "write_target_pressure",
+        "type": "modbus-write",
+        "z": "671c8b8f153cec31",
+        "name": "Write Target Pressure",
+        "showStatusActivities": true,
+        "showErrors": true,
+        "unitid": "1",
+        "dataType": "HoldingRegister",
+        "adr": "26",
+        "quantity": "1",
+        "server": "marco_modbus_client",
+        "x": 540,
+        "y": 2460,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "1f8a0602e412e26b",
+        "type": "inject",
+        "z": "671c8b8f153cec31",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "1234",
+        "payloadType": "num",
+        "x": 90,
+        "y": 2460,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "bc6edd12374bc08a",
+        "type": "modbus-response",
+        "z": "671c8b8f153cec31",
+        "name": "",
+        "registerShowMax": 20,
+        "x": 410,
+        "y": 2540,
+        "wires": []
+    },
+    {
+        "id": "3d350842398697d3",
+        "type": "ping",
+        "z": "671c8b8f153cec31",
+        "protocol": "Automatic",
+        "mode": "timed",
+        "name": "",
+        "host": "192.168.0.10",
+        "timer": "5",
+        "inputs": 0,
+        "x": 490,
+        "y": 2320,
+        "wires": [
+            [
+                "1d956082aa2ed8b1"
+            ]
+        ]
+    },
+    {
+        "id": "1d956082aa2ed8b1",
+        "type": "ui_text",
+        "z": "671c8b8f153cec31",
+        "group": "marco_ui_group",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "PING TIME ",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 690,
+        "y": 2320,
+        "wires": []
+    },
+    {
+        "id": "bd10936aa98887fb",
+        "type": "ui_button",
+        "z": "671c8b8f153cec31",
+        "name": "",
+        "group": "marco_ui_group",
+        "order": 44,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Clear Charts",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "[]",
+        "payloadType": "json",
+        "topic": "payload",
+        "topicType": "msg",
+        "x": 750,
+        "y": 2600,
+        "wires": [
+            [
+                "pressure_gauge",
+                "pressure_chart"
+            ]
+        ]
+    },
+    {
+        "id": "58a4ee51b4d4537c",
+        "type": "comment",
+        "z": "671c8b8f153cec31",
+        "name": "Marco Pressure Controller ",
+        "info": "",
+        "x": 130,
+        "y": 2320,
+        "wires": []
+    },
+    {
+        "id": "16f5ba87ace8eae9",
+        "type": "comment",
+        "z": "671c8b8f153cec31",
+        "name": "Ping Test ",
+        "info": "",
+        "x": 340,
+        "y": 2320,
+        "wires": []
+    },
+    {
+        "id": "a98748c13625e00a",
+        "type": "change",
+        "z": "671c8b8f153cec31",
+        "name": "Get Spray Pressure",
+        "rules": [
+            {
+                "t": "move",
+                "p": "payload.fullModel.global.Pressure_3",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 190,
+        "y": 2400,
+        "wires": [
+            [
+                "dbac5998e157d4df"
+            ]
+        ]
+    },
+    {
+        "id": "dbac5998e157d4df",
+        "type": "rbe",
+        "z": "671c8b8f153cec31",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "septopics": true,
+        "property": "payload",
+        "topi": "topic",
+        "x": 350,
+        "y": 2400,
+        "wires": [
+            [
+                "set_target_ui"
+            ]
+        ]
+    },
+    {
+        "id": "5fe6c16f4a8ff712",
+        "type": "comment",
+        "z": "671c8b8f153cec31",
+        "name": "input from DSF Monitor",
+        "info": "",
+        "x": 120,
+        "y": 2360,
+        "wires": []
+    },
+    {
+        "id": "marco_modbus_client",
+        "type": "modbus-client",
+        "name": "Marco Controller",
+        "clienttype": "tcp",
+        "bufferCommands": true,
+        "stateLogEnabled": false,
+        "queueLogEnabled": false,
+        "failureLogEnabled": false,
+        "tcpHost": "192.168.0.10",
+        "tcpPort": "5020",
+        "tcpType": "DEFAULT",
+        "serialPort": "/dev/ttyUSB0",
+        "serialType": "RTU",
+        "serialBaudrate": "9600",
+        "serialDatabits": "8",
+        "serialStopbits": "1",
+        "serialParity": "none",
+        "serialConnectionDelay": "100",
+        "serialAsciiResponseStartDelimiter": "",
+        "unit_id": 1,
+        "commandDelay": "",
+        "clientTimeout": "",
+        "reconnectOnTimeout": false,
+        "reconnectTimeout": 2000,
+        "parallelUnitIdsAllowed": true,
+        "showErrors": false,
+        "showWarnings": true,
+        "showLogs": true
+    },
+    {
+        "id": "marco_ui_group",
+        "type": "ui_group",
+        "name": "Marco Pressure Control",
+        "tab": "marco_ui_tab",
+        "order": 1,
+        "disp": true,
+        "width": 17,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "marco_ui_tab",
+        "type": "ui_tab",
+        "name": "Marco Testing",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
