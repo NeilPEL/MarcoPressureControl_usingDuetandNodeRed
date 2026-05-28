@@ -1,5 +1,3 @@
-# MarcoPressureControl_usingDuetandNodeRed
-
 # Marco Pressure Control via Duet3D & Node-RED
 
 Integration of an industrial Marco Systems Pressure Controller with a Duet3D 6HC ecosystem. This project uses a Raspberry Pi (SBC mode) as an intelligence bridge to translate between Duet Global Variables and Modbus TCP.
